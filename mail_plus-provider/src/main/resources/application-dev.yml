@@ -1,0 +1,108 @@
+server:
+  port: 8080
+  #内置Tomcat项目名称配置
+  servlet:
+    context-path: /
+path:
+  log: /logs/mail_plus.logs
+
+spring:
+  mail:
+    host: smtp.qq.com
+    username: 1257098712@qq.com
+    password: akrinlryfpzhieii
+    alias: 【测试邮件】
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+  #配置rabbitMq 服务器
+  rabbitmq:
+    addresses: 192.168.40.20:5672,192.168.40.21:5672,192.168.40.22:5672
+    username: rabbitadmin
+    password: 123456
+    publisher-confirms: true
+    publisher-returns: true
+    listener:
+      simple:
+        retry:
+          enabled: true # 开启消费者进行重试
+          max-attempts: 3 # 最大重试次数
+          initial-interval: 3000 # 重试时间间隔
+  #json 时间戳统一转换
+  jackson:
+    date-format:   yyyy-MM-dd HH:mm:ss
+    time-zone:   GMT+8
+  aop:
+    proxy-target-class: true
+  autoconfigure:
+    exclude: com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure
+
+  datasource:
+    dynamic:
+      primary: datacenter #设置默认的数据源或者数据源组,默认值即为master
+      strict: false #设置严格模式,默认false不启动. 启动后在未匹配到指定数据源时候会抛出异常,不启动则使用默认数据源.
+      datasource:
+        datacenter:
+          url: jdbc:mysql://127.0.0.1:3306/mail_plus?characterEncoding=UTF-8&useUnicode=true&useSSL=false&serverTimezone=Asia/Shanghai
+          username: root
+          password: root
+
+  #redis 配置
+  redis:
+    database: 8
+    host: 192.168.40.84
+    lettuce:
+      pool:
+        max-active: 8   #最大连接数据库连接数,设 0 为没有限制
+        max-idle: 8     #最大等待连接中的数量,设 0 为没有限制
+        max-wait: -1ms  #最大建立连接等待时间。如果超过此时间将接到异常。设为-1表示无限制。
+        min-idle: 0     #最小等待连接中的数量,设 0 为没有限制
+      shutdown-timeout: 100ms
+    password: Redisadmin@2019
+    port: 6379
+#mybatis plus 设置
+mybatis-plus:
+  mapper-locations: classpath*:com/daysurprise/mail/provider/modules/**/xml/*Mapper.xml
+  global-config:
+    # 关闭MP3.0自带的banner
+    banner: false
+    db-config:
+      #主键类型  0:"数据库ID自增",1:"该类型为未设置主键类型", 2:"用户输入ID",3:"全局唯一ID (数字类型唯一ID)", 4:"全局唯一ID UUID",5:"字符串全局唯一ID (idWorker 的字符串表示)";
+      id-type: 3
+      # 默认数据库表下划线命名
+      table-underline: true
+    configuration:
+#     这个配置会将执行的sql打印出来，在开发或测试的时候可以用
+      log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+logging:
+  level:
+    com.emax.etl.provider.modules: debug
+dubbo:
+  application:
+    name: mail_plus-provider
+  registry:
+    address: zookeeper://192.168.40.84:2181
+    register: true
+    check: false
+  protocol:
+    name: dubbo
+    port: 20889
+  scan:
+    base-packages: com.daysurprise.mail.provider.modules
+  consumer:
+    timeout: 30000
+    check: false
+    retries: 0
+  provider:
+    timeout: 30000
+
+pagehelper:
+  reasonable: false # 禁用合理化时，如果pageNum<1或pageNum>pages会返回空数据
+  support-methods-arguments: true
+  params: count=countSql
+  row-bounds-with-count: true
+  helper-dialect: mysql
