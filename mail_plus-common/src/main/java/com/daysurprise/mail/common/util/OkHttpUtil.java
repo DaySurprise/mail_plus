@@ -1,6 +1,7 @@
 package com.daysurprise.mail.common.util;
 
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.*;
 import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
